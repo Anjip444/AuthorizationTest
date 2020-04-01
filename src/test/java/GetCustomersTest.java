@@ -17,10 +17,14 @@ public class GetCustomersTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GetCustomersTest.class);
 
+    Token token = new Token();
+
     @BeforeClass
     public String getTokenVal(){
-        Token token = new Token();
-        return token.generateToken();
+        Response resp = token.generateToken("rupeek","password");
+        resp.then().statusCode(HttpStatus.SC_OK);
+        LOGGER.info("Token generated successfully.");
+        return resp.then().statusCode(HttpStatus.SC_OK).extract().body().jsonPath().getString("token");
     }
 
     @Test
@@ -69,5 +73,11 @@ public class GetCustomersTest {
         Response response = util.getUsersByPhone(getTokenVal()+1,phone);
         response.then().statusCode(HttpStatus.SC_UNAUTHORIZED);
         LOGGER.info("Invalid auth Get customers by phone test ended");
+    }
+
+    @Test
+    public void invalidCredentialsTest(){
+        Response resp = token.generateToken("Padega","password");
+        resp.then().statusCode(HttpStatus.SC_UNAUTHORIZED);
     }
 }

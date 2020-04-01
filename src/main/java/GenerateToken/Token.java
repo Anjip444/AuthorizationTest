@@ -2,6 +2,7 @@ package GenerateToken;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import io.restassured.response.Response;
 import org.apache.http.HttpStatus;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
@@ -29,18 +30,17 @@ public class Token {
     private String userName ="rupeek";
     private String pwd ="password";
 
-    public String generateToken(){
+    public Response generateToken(String user, String password){
+        Response resp;
         try{
-            JSONObject bodys = createAuthJsonBody(userName,pwd);
-            String token = RestAssured.given().body(bodys.toJSONString()).contentType("application/json").when()
-                    .post(baseUrl+"/authenticate").then().statusCode(HttpStatus.SC_OK).extract().body().jsonPath().getString("token");
-            LOGGER.info("Token generated Successfully");
-            setToken(token);
+            JSONObject bodys = createAuthJsonBody(user,password);
+            resp = RestAssured.given().body(bodys.toJSONString()).contentType("application/json").when()
+                    .post(baseUrl+"/authenticate");
         }catch(Exception e){
             LOGGER.info("Token generation failed :"+e.getMessage());
             return null;
         }
-        return token;
+        return resp;
 
     }
 
